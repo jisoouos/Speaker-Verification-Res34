@@ -8,7 +8,7 @@ from loss import computeEER
 from torch.utils.data import DataLoader
 from torch.optim.lr_scheduler import CosineAnnealingWarmRestarts
 
-def train(model, optimizer, loss_function, train_loader,valid_loader, epoch,model_link):
+def train(model:torch.nn.Module, optimizer, loss_function, train_loader,valid_loader, epoch,model_link):
     model.train()
     lowest_eer = 999
     scheduler = CosineAnnealingWarmRestarts(optimizer,
