@@ -1,11 +1,20 @@
-import glob, numpy, os, random, soundfile, torch
+import glob, numpy, os, random, soundfile, torch ,itertools
+import numpy as np
 import librosa
+from torch.utils.data import Dataset
+from typing import Tuple
 from scipy import signal
+import  torchaudio.transforms as AudioT
+from torch import nn
+
 
 class train_loader(object):
 	def __init__(self, train_list, train_path, num_frames):
 		self.train_path = train_path #train 파일 경로
 		self.num_frames = num_frames #프레임수
+		self.MFCC = AudioT.MFCC(sample_rate=16000,n_mfcc=80,log_mels=True,melkwargs=
+         {'n_fft': 512, 'hop_length':160,'win_length':400,'n_mels':80, "center": False})
+		self.Norm = nn.InstanceNorm1d(80)
 		# Load and configure augmentation files
 		"""self.noisetypes = ['noise','speech','music']
 		self.noisesnr = {'noise':[0,15],'speech':[13,20],'music':[5,15]}
@@ -21,25 +30,44 @@ class train_loader(object):
 		self.data_list  = [] 
 		self.data_label = []
 		lines = open(train_list).read().splitlines()
-		
+		#print(lines)
 		dictkeys = list(set([x.split()[0] for x in lines]))
 		dictkeys.sort()
 		dictkeys = { key : ii for ii, key in enumerate(dictkeys) }
-
+		#print(dictkeys)
 		for index, line in enumerate(lines):
 			speaker_label = dictkeys[line.split()[0]]
 			file_name = os.path.join(train_path, line.split()[1])
 			self.data_label.append(speaker_label)
 			self.data_list.append(file_name)
-			
-		self.pad2d = lambda a, i: a[:, 0:i] if a.shape[1] > i else numpy.hstack((a, numpy.zeros((a.shape[0], i-a.shape[1]))))
+		#print(self.data_label)
+		#print(self.data_list)			
+	def loadWAV(self,filename, max_frames, evalmode=True, num_eval=10):
 
+        # Maximum audio length
+		max_audio = max_frames * 160 + 240
 
+        # Read wav file and convert to torch tensor
+		audio, sample_rate = soundfile.read(filename)
+
+		audiosize = audio.shape[0]
+
+		if audiosize <= max_audio: #오디오길이 padding
+			shortage = max_audio - audiosize + 1
+			audio = numpy.pad(audio, (0, shortage), 'wrap')
+			audiosize = audio.shape[0]
+
+		startframe = np.int64(random.random() * (audio.shape[0] - max_audio))
+
+		audio = audio[startframe:startframe + max_audio]
+		audio = np.stack([audio], axis=0).astype(numpy.float32)
+		return audio
+	
 	def __getitem__(self, index):
 		# Read the utterance and randomly select the segment
-		audio, sr = librosa.load(self.data_list[index], sr=44100)
-		mfcc = librosa.feature.mfcc(audio=audio, sr=sr, n_mfcc=13, n_fft=int(0.02 * sr), hop_length=int(0.01 * sr))
-		padded_mfcc = self.pad2d(mfcc, 40)
+		data = self.loadWAV(self.data_list[index],  max_frames=self.num_frames, evalmode=False)
+		data = self.MFCC(torch.from_numpy(data))
+		data = self.Norm(data).reshape(1, 80, -1)
 		#audio = numpy.stack([audio],axis=0)
 		# Data Augmentation
 		"""augtype = random.randint(0,5)
@@ -56,7 +84,7 @@ class train_loader(object):
 		elif augtype == 5: # Television noise
 			audio = self.add_noise(audio, 'speech')
 			audio = self.add_noise(audio, 'music')"""
-		return torch.FloatTensor(padded_mfcc), self.data_label[index]
+		return data, self.data_label[index]
 
 	def __len__(self):
 		return len(self.data_list)
@@ -87,3 +115,63 @@ class train_loader(object):
 			noises.append(numpy.sqrt(10 ** ((clean_db - noise_db - noisesnr) / 10)) * noiseaudio)
 		noise = numpy.sum(numpy.concatenate(noises,axis=0),axis=0,keepdims=True)
 		return noise + audio
+	
+
+
+class test_loader(Dataset):
+	def __init__(self, test_list, test_path, eval_frames, num_eval):
+		self.test_path = test_path 
+		self.num_eval = num_eval
+		self.max_frames =eval_frames
+		self.Norm = nn.InstanceNorm1d(80)
+		# Load data & labels
+		self.data_list  = [] 
+		self.data_label = []
+		self.MFCC = AudioT.MFCC(sample_rate=16000, n_mfcc=80, log_mels=True, melkwargs=
+        {'n_fft': 512, 'hop_length': 160, 'win_length': 400, 'n_mels': 80, "center": False})
+		with open(test_list) as f:
+			lines = f.readlines()
+		
+		files = list(itertools.chain(*[x.strip().split()[-2:] for x in lines]))
+		set_files = list(set(files))
+		set_files.sort()
+		#print(set_files)
+
+		for index, line in enumerate(set_files):
+			file_name = os.path.join(test_path, line)
+			self.data_list.append(file_name)
+
+	def loadWAV(self, filename):
+
+        # Maximum audio length
+		audio_length =  200 * 160 + 240
+
+        # Read wav file and convert to torch tensor
+		data, sr = librosa.load(filename, sr=16000)
+
+		if len(data) > audio_length:
+			max_offset = len(data) - audio_length
+			offset = np.random.randint(max_offset)
+			data = data[offset:(audio_length + offset)]
+
+		else:
+			if audio_length > len(data):
+				max_offset = audio_length - len(data)
+				offset = np.random.randint(max_offset)
+			else:
+				offset = 0
+			data = np.pad(data, (offset, audio_length - len(data) - offset), "constant")
+
+		return data
+
+
+
+	def __getitem__(self, index) -> Tuple[torch.Tensor, str]:
+		# Read the utterance and randomly select the segment
+		data = self.loadWAV(self.data_list[index])
+		data = self.MFCC(torch.from_numpy(data))
+		data = self.Norm(data).reshape(1, 80, -1)
+		return data, self.data_list[index]
+
+	def __len__(self):
+		return len(self.data_list)

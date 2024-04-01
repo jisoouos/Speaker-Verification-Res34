@@ -1,14 +1,15 @@
 from torch import nn
 import torch 
+from ResBlock import BasicBlock
 
 
 class ResNet(nn.Module):
-    def __init__(self,block,layers,num_classes=1000):
+    def __init__(self,block:BasicBlock,layers,num_classes=512):
         super().__init__()
 
         self.inplanes =64
         self.stem= nn.Sequential(
-            nn.Conv2d(3,self.inplanes,kernel_size=7,stride=2,padding=3,bias=False),
+            nn.Conv2d(1,64,kernel_size=7,stride=2,padding=3,bias=False),
             nn.BatchNorm2d(self.inplanes),
             nn.ReLU(inplace=True),
             nn.MaxPool2d(kernel_size=3,stride=2,padding=1)
@@ -21,13 +22,12 @@ class ResNet(nn.Module):
         self.avgpool=nn.AdaptiveAvgPool2d((1,1))
         self.fc=nn.Linear(512*block.expansion,num_classes)
 
-    def _make_layer(self,block,planes,num_blocks,stride):
+    def _make_layer(self,block:BasicBlock,planes,num_blocks,stride):
         layers=[]
         layers.append(block(self.inplanes,planes,stride))
         self.inplanes=planes*block.expansion
         for _ in range(num_blocks-1):
             layers.append(block(self.inplanes,planes,1))
-
         return nn.Sequential(*layers)
     
     def forward(self,x):
@@ -39,5 +39,6 @@ class ResNet(nn.Module):
         out = self.avgpool(out)
         out = torch.flatten(out,1)
         out=self.fc(out)
+
         return out
         
