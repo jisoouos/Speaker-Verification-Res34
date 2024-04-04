@@ -42,10 +42,10 @@ class train_loader(object):
 			self.data_list.append(file_name)
 		#print(self.data_label)
 		#print(self.data_list)			
-	def loadWAV(self,filename, max_frames, evalmode=True, num_eval=10):
+	def loadWAV(self,filename, max_frames):
 
         # Maximum audio length
-		max_audio = max_frames * 160 + 240
+		max_audio = 300 * 160 + 240
 
         # Read wav file and convert to torch tensor
 		audio, sample_rate = soundfile.read(filename)
@@ -65,7 +65,7 @@ class train_loader(object):
 	
 	def __getitem__(self, index):
 		# Read the utterance and randomly select the segment
-		data = self.loadWAV(self.data_list[index],  max_frames=self.num_frames, evalmode=False)
+		data = self.loadWAV(self.data_list[index],  max_frames=self.num_frames)
 		data = self.MFCC(torch.from_numpy(data))
 		data = self.Norm(data).reshape(1, 80, -1)
 		#audio = numpy.stack([audio],axis=0)
@@ -144,20 +144,19 @@ class test_loader(Dataset):
 	def loadWAV(self, filename):
 
         # Maximum audio length
-		audio_length =  200 * 160 + 240
+		audio_length =  300 * 160 + 240
 
         # Read wav file and convert to torch tensor
 		data, sr = librosa.load(filename, sr=16000)
 
 		if len(data) > audio_length:
-			max_offset = len(data) - audio_length
-			offset = np.random.randint(max_offset)
+			offset = len(data) - audio_length
+			#offset = np.random.randint(max_offset)
 			data = data[offset:(audio_length + offset)]
 
 		else:
 			if audio_length > len(data):
-				max_offset = audio_length - len(data)
-				offset = np.random.randint(max_offset)
+				offset = audio_length - len(data)
 			else:
 				offset = 0
 			data = np.pad(data, (offset, audio_length - len(data) - offset), "constant")

@@ -17,7 +17,7 @@ optimizer = optim.AdamW([
     {'params': lossfunc.parameters(), 'weight_decay': 2e-4}
 ], lr=1e-3, weight_decay=2e-5)
 TrainingSet = train_loader("/data/VoxCeleb1/train_list.txt", "/data/VoxCeleb1/train", 200)
-TrainDatasetLoader = DataLoader(TrainingSet, batch_size = 128, shuffle = True, num_workers = 10, drop_last = True)
+TrainDatasetLoader = DataLoader(TrainingSet, batch_size = 64, shuffle = True, num_workers = 10, drop_last = True)
 ValidSet = test_loader('/data/VoxCeleb1/trials.txt','/data/VoxCeleb1/test', 200,10)
 ValidDatasetLoader = DataLoader(ValidSet, batch_size = 1, shuffle = False, num_workers = 10, drop_last = True)
 

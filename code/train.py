@@ -8,10 +8,13 @@ from torch.utils.data import DataLoader
 from torch.optim.lr_scheduler import CyclicLR
 
 
+
 def train(model:torch.nn.Module, optimizer, loss_function, train_loader,valid_loader, epoch,model_link):
     model.train()
     lowest_eer = 999
-    scheduler = CyclicLR(optimizer,base_lr=1e-8,max_lr=1e-3,step_size_up=6500,mode='triangular2',cycle_momentum=False)
+    #scheduler = CyclicLR(optimizer,base_lr=1e-8,max_lr=1e-3,step_size_up=6500,mode='triangular2',cycle_momentum=False)
+    scheduler= torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(optimizer, T_0=10, T_mult=1, eta_min=0.001, last_epoch=-1)
+    
     #valid_eer = valid(model, valid_loader)
     #print(valid_eer)
     for iteration in range(epoch):
@@ -27,15 +30,15 @@ def train(model:torch.nn.Module, optimizer, loss_function, train_loader,valid_lo
                 
                 loss.backward() 
                 optimizer.step()
-                scheduler.step()
+                #scheduler.step()
                 train_loss += loss.item()
-        for name, param in model.named_parameters():
-            count+=1
-            if count==1:
-                print(param)
-                print(name)
+        #for name, param in model.named_parameters():
+         #   count+=1
+          #  if count==1:
+           #     print(param)
+            #    print(name)
         valid_eer = valid(model, valid_loader)
-        
+        scheduler.step() 
         if valid_eer < lowest_eer:
             lowest_eer = valid_eer
             torch.save(model.state_dict(), model_link+"_"+str(lowest_eer)+'.pt')
@@ -68,7 +71,7 @@ def valid(model:torch.nn.Module, valid_loader:DataLoader):
 
         ref_feat = embeddings[os.path.join('/data/VoxCeleb1/test', data[1])].cuda()
         com_feat = embeddings[os.path.join('/data/VoxCeleb1/test', data[2])].cuda()
-        print(data[1],1,data[2],2)
+        #print(data[1],1,data[2],2)
         score = cosine_similarity(ref_feat,com_feat).detach().cpu().numpy()
         #print(score)
         all_scores.append(score)
