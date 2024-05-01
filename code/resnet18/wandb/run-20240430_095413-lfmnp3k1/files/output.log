@@ -1,0 +1,27 @@
+
+[34m[1mwandb[39m[22m: [33mWARNING[39m Calling wandb.run.save without any arguments is deprecated.Changes to attributes are automatically persisted.
+
+
+
+
+
+
+  1%|▍                                      | 101/9290 [00:13<20:49,  7.35it/s]
+Traceback (most recent call last):
+  File "./main.py", line 28, in <module>
+    train(model, optimizer, lossfunc ,TrainDatasetLoader,ValidDatasetLoader, num_epochs,'/eer')
+  File "/code/resnet18/train.py", line 35, in train
+    optimizer.step()
+  File "/opt/conda/lib/python3.8/site-packages/torch/optim/lr_scheduler.py", line 68, in wrapper
+    return wrapped(*args, **kwargs)
+  File "/opt/conda/lib/python3.8/site-packages/torch/optim/optimizer.py", line 140, in wrapper
+    out = func(*args, **kwargs)
+  File "/opt/conda/lib/python3.8/site-packages/torch/autograd/grad_mode.py", line 27, in decorate_context
+    return func(*args, **kwargs)
+  File "/opt/conda/lib/python3.8/site-packages/torch/optim/adamw.py", line 162, in step
+    adamw(params_with_grad,
+  File "/opt/conda/lib/python3.8/site-packages/torch/optim/adamw.py", line 219, in adamw
+    func(params,
+  File "/opt/conda/lib/python3.8/site-packages/torch/optim/adamw.py", line 316, in _single_tensor_adamw
+    denom = (exp_avg_sq.sqrt() / bias_correction2_sqrt).add_(eps)
+KeyboardInterrupt

@@ -1,0 +1,34 @@
+2024-04-30 10:06:17,869 INFO    MainThread:1759933 [wandb_setup.py:_flush():76] Configure stats pid to 1759933
+2024-04-30 10:06:17,870 INFO    MainThread:1759933 [wandb_setup.py:_flush():76] Loading settings from /root/.config/wandb/settings
+2024-04-30 10:06:17,870 INFO    MainThread:1759933 [wandb_setup.py:_flush():76] Loading settings from /code/resnet18/wandb/settings
+2024-04-30 10:06:17,870 INFO    MainThread:1759933 [wandb_setup.py:_flush():76] Loading settings from environment variables: {}
+2024-04-30 10:06:17,870 INFO    MainThread:1759933 [wandb_setup.py:_flush():76] Inferring run settings from compute environment: {'program_relpath': 'main.py', 'program': './main.py'}
+2024-04-30 10:06:17,870 INFO    MainThread:1759933 [wandb_setup.py:_flush():76] Applying login settings: {'api_key': '***REDACTED***'}
+2024-04-30 10:06:17,870 INFO    MainThread:1759933 [wandb_setup.py:_flush():76] Applying login settings: {'api_key': '***REDACTED***'}
+2024-04-30 10:06:17,870 INFO    MainThread:1759933 [wandb_init.py:_log_setup():506] Logging user logs to /code/resnet18/wandb/run-20240430_100617-xiuy8c9s/logs/debug.log
+2024-04-30 10:06:17,870 INFO    MainThread:1759933 [wandb_init.py:_log_setup():507] Logging internal logs to /code/resnet18/wandb/run-20240430_100617-xiuy8c9s/logs/debug-internal.log
+2024-04-30 10:06:17,870 INFO    MainThread:1759933 [wandb_init.py:init():546] calling init triggers
+2024-04-30 10:06:17,870 INFO    MainThread:1759933 [wandb_init.py:init():552] wandb.init called with sweep_config: {}
+config: {}
+2024-04-30 10:06:17,870 INFO    MainThread:1759933 [wandb_init.py:init():602] starting backend
+2024-04-30 10:06:17,870 INFO    MainThread:1759933 [wandb_init.py:init():606] setting up manager
+2024-04-30 10:06:17,873 INFO    MainThread:1759933 [backend.py:_multiprocessing_setup():106] multiprocessing start_methods=fork,spawn,forkserver, using: spawn
+2024-04-30 10:06:17,875 INFO    MainThread:1759933 [wandb_init.py:init():613] backend started and connected
+2024-04-30 10:06:17,878 INFO    MainThread:1759933 [wandb_init.py:init():701] updated telemetry
+2024-04-30 10:06:17,879 INFO    MainThread:1759933 [wandb_init.py:init():741] communicating run to backend with 60.0 second timeout
+2024-04-30 10:06:18,539 INFO    MainThread:1759933 [wandb_run.py:_on_init():2131] communicating current version
+2024-04-30 10:06:18,641 INFO    MainThread:1759933 [wandb_run.py:_on_init():2140] got version response upgrade_message: "wandb version 0.16.6 is available!  To upgrade, please run:\n $ pip install wandb --upgrade"
+
+2024-04-30 10:06:18,641 INFO    MainThread:1759933 [wandb_init.py:init():789] starting run threads in backend
+2024-04-30 10:06:19,452 INFO    MainThread:1759933 [wandb_run.py:_console_start():2112] atexit reg
+2024-04-30 10:06:19,452 INFO    MainThread:1759933 [wandb_run.py:_redirect():1967] redirect: SettingsConsole.WRAP_RAW
+2024-04-30 10:06:19,452 INFO    MainThread:1759933 [wandb_run.py:_redirect():2032] Wrapping output streams.
+2024-04-30 10:06:19,452 INFO    MainThread:1759933 [wandb_run.py:_redirect():2057] Redirects installed.
+2024-04-30 10:06:19,453 INFO    MainThread:1759933 [wandb_init.py:init():831] run started, returning control to user process
+2024-05-01 00:01:19,693 INFO    MainThread:1759933 [wandb_run.py:_finish():1852] finishing run hojasu07/SpeakerVerification EER Of Various Models/xiuy8c9s
+2024-05-01 00:01:19,694 INFO    MainThread:1759933 [wandb_run.py:_atexit_cleanup():2081] got exitcode: 0
+2024-05-01 00:01:19,694 INFO    MainThread:1759933 [wandb_run.py:_restore():2064] restore
+2024-05-01 00:01:19,694 INFO    MainThread:1759933 [wandb_run.py:_restore():2070] restore done
+2024-05-01 00:01:25,076 INFO    MainThread:1759933 [wandb_run.py:_footer_history_summary_info():3429] rendering history
+2024-05-01 00:01:25,078 INFO    MainThread:1759933 [wandb_run.py:_footer_history_summary_info():3461] rendering summary
+2024-05-01 00:01:25,087 INFO    MainThread:1759933 [wandb_run.py:_footer_sync_info():3387] logging synced files
